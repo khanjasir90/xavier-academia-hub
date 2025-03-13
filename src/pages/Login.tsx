@@ -1,39 +1,30 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { GraduationCap } from 'lucide-react';
-import LoginForm from '@/components/auth/LoginForm';
-import { User } from '@/utils/types';
 import { useToast } from '@/hooks/use-toast';
-import { getMockUsers } from '@/utils/mockData';
+import { mockLogin } from '@/utils/mockData';
 
 const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
-  const handleLogin = (username: string, password: string, role: 'admin' | 'teacher' | 'student') => {
+  const handleLogin = () => {
     setIsLoading(true);
     
     // Simulate API call
     setTimeout(() => {
-      const users = getMockUsers();
-      const user = users.find(u => 
-        u.username === username && 
-        u.password === password && 
-        u.role === role
-      );
+      const user = mockLogin(username, password);
       
       if (user) {
-        // Remove password before storing
-        const { password, ...safeUser } = user;
-        localStorage.setItem('currentUser', JSON.stringify(safeUser));
-        
         toast({
           title: "Login successful",
-          description: `Welcome back, ${safeUser.name}!`,
+          description: `Welcome back, ${user.name}!`,
         });
         
         navigate('/dashboard');
@@ -49,13 +40,32 @@ const Login = () => {
     }, 1000);
   };
   
+  // Role-specific login handlers
+  const handleAdminLogin = () => {
+    setUsername('admin');
+    setPassword('admin123');
+    setTimeout(handleLogin, 100);
+  };
+  
+  const handleTeacherLogin = () => {
+    setUsername('teacher');
+    setPassword('teacher123');
+    setTimeout(handleLogin, 100);
+  };
+  
+  const handleStudentLogin = () => {
+    setUsername('student');
+    setPassword('student123');
+    setTimeout(handleLogin, 100);
+  };
+  
   // Check if user is already logged in
-  useState(() => {
+  useEffect(() => {
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
       navigate('/dashboard');
     }
-  });
+  }, [navigate]);
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-xavier-50 to-xavier-100">
@@ -74,8 +84,32 @@ const Login = () => {
                 Enter your credentials to access your account
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <LoginForm onLogin={handleLogin} isLoading={isLoading} />
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Username</label>
+                <input 
+                  type="text" 
+                  className="w-full px-3 py-2 border rounded-md"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Password</label>
+                <input 
+                  type="password"
+                  className="w-full px-3 py-2 border rounded-md"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              <Button 
+                className="w-full" 
+                onClick={handleLogin}
+                disabled={isLoading}
+              >
+                {isLoading ? "Signing in..." : "Sign in"}
+              </Button>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
               <div className="text-sm text-gray-500 text-center w-full">
@@ -85,7 +119,7 @@ const Login = () => {
                     variant="outline" 
                     size="sm"
                     className="text-xs"
-                    onClick={() => handleLogin('admin', 'admin123', 'admin')}
+                    onClick={handleAdminLogin}
                   >
                     Admin
                   </Button>
@@ -93,7 +127,7 @@ const Login = () => {
                     variant="outline" 
                     size="sm"
                     className="text-xs"
-                    onClick={() => handleLogin('teacher', 'teacher123', 'teacher')}
+                    onClick={handleTeacherLogin}
                   >
                     Teacher
                   </Button>
@@ -101,7 +135,7 @@ const Login = () => {
                     variant="outline" 
                     size="sm"
                     className="text-xs"
-                    onClick={() => handleLogin('student', 'student123', 'student')}
+                    onClick={handleStudentLogin}
                   >
                     Student
                   </Button>

@@ -235,7 +235,7 @@ const Dashboard = ({ user }: { user: User }) => {
                         <h4 className="font-medium">{schedule.day}</h4>
                         <p className="text-sm text-gray-600">{schedule.startTime} - {schedule.endTime}</p>
                         <p className="text-sm text-gray-500">{classItem.name}</p>
-                        <p className="text-xs text-gray-400 mt-1">{schedule.room}</p>
+                        {schedule.room && <p className="text-xs text-gray-400 mt-1">{schedule.room}</p>}
                       </div>
                     </div>
                   ))

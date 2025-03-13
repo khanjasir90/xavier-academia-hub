@@ -3,10 +3,16 @@ export type UserRole = 'admin' | 'teacher' | 'student';
 
 export interface User {
   id: string;
+  username?: string; // Added for login
+  password?: string; // Added for login
   name: string;
   email: string;
   role: UserRole;
   imageUrl?: string;
+  department?: string; // Added for faculty
+  studentId?: string; // Added for students
+  classIds?: string[]; // Added for class enrollment
+  attendanceRecords?: AttendanceRecord[]; // Added for attendance tracking
 }
 
 export interface Class {
@@ -20,9 +26,11 @@ export interface Class {
     day: string;
     startTime: string;
     endTime: string;
+    room?: string; // Added room property
   }[];
   studentIds: string[];
   imageUrl?: string;
+  notes?: Note[]; // Added for class notes
 }
 
 export interface Note {
@@ -49,4 +57,10 @@ export interface AttendanceSummary {
   totalClasses: number;
   presentClasses: number;
   percentage: number;
+}
+
+export interface AttendanceRecord {
+  classId: string;
+  date: string;
+  status: 'present' | 'absent';
 }

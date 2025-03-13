@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { User, Class, Note } from '@/utils/types';
-import { classes, users, getNotesForClass, generateAttendanceSummary } from '@/utils/mockData';
+import { getClassById, getMockUsers, getNotesForClass, generateAttendanceSummary } from '@/utils/mockData';
 import { BookOpen, Clock, Users as UsersIcon, CalendarDays, FileText } from 'lucide-react';
 
 const ClassDetail = () => {
@@ -17,6 +17,7 @@ const ClassDetail = () => {
   const [classData, setClassData] = useState<Class | null>(null);
   const [notes, setNotes] = useState<Note[]>([]);
   const [user, setUser] = useState<User | null>(null);
+  const [students, setStudents] = useState<User[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   
   useEffect(() => {
@@ -31,13 +32,20 @@ const ClassDetail = () => {
     
     // Find class by ID
     if (id) {
-      const foundClass = classes.find(c => c.id === id);
+      const foundClass = getClassById(id);
       if (foundClass) {
         setClassData(foundClass);
         
         // Load notes for this class
         const classNotes = getNotesForClass(id);
         setNotes(classNotes);
+        
+        // Get students in this class
+        const allUsers = getMockUsers();
+        const classStudents = foundClass.studentIds
+          .map(studentId => allUsers.find(u => u.id === studentId))
+          .filter(u => u !== undefined) as User[];
+        setStudents(classStudents);
       } else {
         navigate('/classes');
       }
@@ -51,11 +59,6 @@ const ClassDetail = () => {
   if (!classData || !user) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
-  
-  // Get students in this class
-  const classStudents = classData.studentIds.map(id => 
-    users.find(u => u.id === id)
-  ).filter(u => u !== undefined) as User[];
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -131,6 +134,7 @@ const ClassDetail = () => {
                               <div>
                                 <p className="font-medium">{s.day}</p>
                                 <p className="text-sm text-gray-600">{s.startTime} - {s.endTime}</p>
+                                {s.room && <p className="text-sm text-gray-500">{s.room}</p>}
                               </div>
                             </div>
                           ))}
@@ -158,7 +162,7 @@ const ClassDetail = () => {
                         <div className="mt-1 flex items-center">
                           <div className="h-8 w-8 rounded-full overflow-hidden mr-2">
                             <img 
-                              src={users.find(u => u.id === classData.teacherId)?.imageUrl || `https://ui-avatars.com/api/?name=${classData.teacherName}`}
+                              src={getMockUsers().find(u => u.id === classData.teacherId)?.imageUrl || `https://ui-avatars.com/api/?name=${classData.teacherName}`}
                               alt={classData.teacherName}
                               className="h-full w-full object-cover"
                             />
@@ -196,10 +200,10 @@ const ClassDetail = () => {
                       <div>
                         <h3 className="text-sm font-medium text-gray-500 flex items-center">
                           <UsersIcon size={16} className="mr-1" />
-                          Students ({classStudents.length})
+                          Students ({students.length})
                         </h3>
                         <div className="mt-2 space-y-2">
-                          {classStudents.map(student => (
+                          {students.map(student => (
                             <div key={student.id} className="flex items-center">
                               <div className="h-6 w-6 rounded-full overflow-hidden mr-2">
                                 <img 

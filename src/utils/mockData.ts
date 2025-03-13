@@ -1,5 +1,5 @@
 
-import { User, Class, Note, AttendanceRecord } from './types';
+import { User, Class, Note, AttendanceRecord, AttendanceSummary } from './types';
 
 // Mock Users
 export const getMockUsers = (): User[] => [
@@ -71,7 +71,7 @@ export const getMockUsers = (): User[] => [
 ];
 
 // Mock Classes
-const mockClasses: Class[] = [
+export const classes: Class[] = [
   {
     id: 'cs101',
     name: 'Introduction to Computer Science',
@@ -86,8 +86,8 @@ const mockClasses: Class[] = [
     ],
     studentIds: ['student1', 'student2'],
     notes: [
-      { id: 'note1', title: 'Introduction to Algorithms', content: 'Algorithms are step-by-step procedures for calculations...', date: '2023-09-01', attachments: [] },
-      { id: 'note2', title: 'Control Structures', content: 'Control structures are the blocks that analyze variables...', date: '2023-09-03', attachments: [] },
+      { id: 'note1', title: 'Introduction to Algorithms', content: 'Algorithms are step-by-step procedures for calculations...', createdAt: '2023-09-01', updatedAt: '2023-09-01' },
+      { id: 'note2', title: 'Control Structures', content: 'Control structures are the blocks that analyze variables...', createdAt: '2023-09-03', updatedAt: '2023-09-03' },
     ],
   },
   {
@@ -104,7 +104,7 @@ const mockClasses: Class[] = [
     ],
     studentIds: ['student2'],
     notes: [
-      { id: 'note3', title: 'Arrays and Linked Lists', content: 'Arrays and linked lists are fundamental data structures...', date: '2023-09-02', attachments: [] },
+      { id: 'note3', title: 'Arrays and Linked Lists', content: 'Arrays and linked lists are fundamental data structures...', createdAt: '2023-09-02', updatedAt: '2023-09-02' },
     ],
   },
   {
@@ -121,7 +121,7 @@ const mockClasses: Class[] = [
     ],
     studentIds: ['student1'],
     notes: [
-      { id: 'note4', title: 'Limits and Continuity', content: 'A limit is the value that a function approaches...', date: '2023-09-04', attachments: [] },
+      { id: 'note4', title: 'Limits and Continuity', content: 'A limit is the value that a function approaches...', createdAt: '2023-09-04', updatedAt: '2023-09-04' },
     ],
   },
   {
@@ -138,7 +138,7 @@ const mockClasses: Class[] = [
     ],
     studentIds: ['student1', 'student2'],
     notes: [
-      { id: 'note5', title: 'Essay Structure', content: 'A well-structured essay includes an introduction, body paragraphs...', date: '2023-09-05', attachments: [] },
+      { id: 'note5', title: 'Essay Structure', content: 'A well-structured essay includes an introduction, body paragraphs...', createdAt: '2023-09-05', updatedAt: '2023-09-05' },
     ],
   },
   {
@@ -158,9 +158,23 @@ const mockClasses: Class[] = [
   },
 ];
 
+// Mock login function
+export const mockLogin = (username: string, password: string): User | null => {
+  const users = getMockUsers();
+  const user = users.find(u => u.username === username && u.password === password);
+  
+  if (user) {
+    // Remove password before returning
+    const { password, ...safeUser } = user;
+    return safeUser;
+  }
+  
+  return null;
+};
+
 // Get all classes
 export const getAllClasses = (): Class[] => {
-  return mockClasses;
+  return classes;
 };
 
 // Get classes for a specific user
@@ -171,15 +185,15 @@ export const getClassesForUser = (userId: string): Class[] => {
   if (!user) return [];
   
   if (user.role === 'admin') {
-    return mockClasses;
+    return classes;
   }
   
   if (user.role === 'teacher') {
-    return mockClasses.filter(c => c.teacherId === userId);
+    return classes.filter(c => c.teacherId === userId);
   }
   
   if (user.role === 'student') {
-    return mockClasses.filter(c => c.studentIds.includes(userId));
+    return classes.filter(c => c.studentIds.includes(userId));
   }
   
   return [];
@@ -187,12 +201,12 @@ export const getClassesForUser = (userId: string): Class[] => {
 
 // Get a specific class by ID
 export const getClassById = (classId: string): Class | undefined => {
-  return mockClasses.find(c => c.id === classId);
+  return classes.find(c => c.id === classId);
 };
 
 // Get notes for a specific class
 export const getNotesForClass = (classId: string): Note[] => {
-  const classData = mockClasses.find(c => c.id === classId);
+  const classData = classes.find(c => c.id === classId);
   return classData?.notes || [];
 };
 
@@ -203,12 +217,24 @@ export const getAttendanceForStudent = (studentId: string): AttendanceRecord[] =
   return student?.attendanceRecords || [];
 };
 
-// Calculate attendance percentage for a student in a specific class
-export const calculateAttendancePercentage = (studentId: string, classId: string): number => {
+// Generate attendance summary for a student in a class
+export const generateAttendanceSummary = (classId: string, studentId: string): AttendanceSummary => {
   const records = getAttendanceForStudent(studentId).filter(r => r.classId === classId);
+  const totalClasses = records.length;
+  const presentClasses = records.filter(r => r.status === 'present').length;
+  const percentage = totalClasses > 0 ? (presentClasses / totalClasses) * 100 : 0;
   
-  if (records.length === 0) return 0;
+  const users = getMockUsers();
+  const student = users.find(u => u.id === studentId);
   
-  const presentCount = records.filter(r => r.status === 'present').length;
-  return Math.round((presentCount / records.length) * 100);
+  return {
+    studentId,
+    studentName: student?.name || 'Unknown Student',
+    totalClasses,
+    presentClasses,
+    percentage
+  };
 };
+
+// Get users export
+export const users = getMockUsers();
