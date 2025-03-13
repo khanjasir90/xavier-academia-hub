@@ -10,6 +10,9 @@ import Dashboard from "./pages/Dashboard";
 import Classes from "./pages/Classes";
 import ClassDetail from "./pages/ClassDetail";
 import Attendance from "./pages/Attendance";
+import Students from "./pages/Students";
+import Faculty from "./pages/Faculty";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +30,9 @@ const App = () => (
           <Route path="/classes" element={<Classes />} />
           <Route path="/class/:id" element={<ClassDetail />} />
           <Route path="/attendance" element={<Attendance />} />
+          <Route path="/students" element={<Students />} />
+          <Route path="/faculty" element={<Faculty />} />
+          <Route path="/settings" element={<Settings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

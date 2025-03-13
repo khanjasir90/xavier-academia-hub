@@ -1,44 +1,116 @@
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import LoginForm from '@/components/auth/LoginForm';
-import Navbar from '@/components/layout/Navbar';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { GraduationCap } from 'lucide-react';
+import LoginForm from '@/components/auth/LoginForm';
+import { User } from '@/utils/types';
+import { useToast } from '@/hooks/use-toast';
+import { getMockUsers } from '@/utils/mockData';
 
 const Login = () => {
-  const [mounted, setMounted] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const handleLogin = (username: string, password: string, role: 'admin' | 'teacher' | 'student') => {
+    setIsLoading(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      const users = getMockUsers();
+      const user = users.find(u => 
+        u.username === username && 
+        u.password === password && 
+        u.role === role
+      );
+      
+      if (user) {
+        // Remove password before storing
+        const { password, ...safeUser } = user;
+        localStorage.setItem('currentUser', JSON.stringify(safeUser));
+        
+        toast({
+          title: "Login successful",
+          description: `Welcome back, ${safeUser.name}!`,
+        });
+        
+        navigate('/dashboard');
+      } else {
+        toast({
+          title: "Login failed",
+          description: "Invalid username or password",
+          variant: "destructive"
+        });
+      }
+      
+      setIsLoading(false);
+    }, 1000);
+  };
   
   // Check if user is already logged in
-  useEffect(() => {
-    const user = localStorage.getItem('currentUser');
-    if (user) {
+  useState(() => {
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
       navigate('/dashboard');
     }
-    setMounted(true);
-  }, [navigate]);
-  
-  if (!mounted) return null;
+  });
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      
-      <main className="flex-1 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        {/* Decorative elements */}
-        <div className="absolute top-0 left-0 -translate-y-1/2 -translate-x-1/2 w-96 h-96 bg-xavier-100 rounded-full filter blur-3xl opacity-50"></div>
-        <div className="absolute bottom-0 right-0 translate-y-1/2 translate-x-1/2 w-96 h-96 bg-xavier-200 rounded-full filter blur-3xl opacity-50"></div>
-        
-        <div className="w-full max-w-md animate-fade-in">
-          <div className="flex justify-center mb-8">
-            <div className="bg-xavier-50 p-3 rounded-xl shadow-sm">
-              <GraduationCap className="h-12 w-12 text-xavier-600" />
-            </div>
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-xavier-50 to-xavier-100">
+      <div className="container flex flex-col items-center justify-center flex-1 px-4 py-12">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <GraduationCap className="h-12 w-12 text-xavier-600 mx-auto" />
+            <h1 className="mt-4 text-3xl font-bold text-xavier-800">Xavier College ERP</h1>
+            <p className="mt-2 text-gray-600">Sign in to your account</p>
           </div>
           
-          <LoginForm />
+          <Card className="w-full shadow-lg animation-fade-in">
+            <CardHeader>
+              <CardTitle>Login</CardTitle>
+              <CardDescription>
+                Enter your credentials to access your account
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <LoginForm onLogin={handleLogin} isLoading={isLoading} />
+            </CardContent>
+            <CardFooter className="flex flex-col space-y-4">
+              <div className="text-sm text-gray-500 text-center w-full">
+                Demo Accounts:
+                <div className="grid grid-cols-3 gap-2 mt-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="text-xs"
+                    onClick={() => handleLogin('admin', 'admin123', 'admin')}
+                  >
+                    Admin
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="text-xs"
+                    onClick={() => handleLogin('teacher', 'teacher123', 'teacher')}
+                  >
+                    Teacher
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="text-xs"
+                    onClick={() => handleLogin('student', 'student123', 'student')}
+                  >
+                    Student
+                  </Button>
+                </div>
+              </div>
+            </CardFooter>
+          </Card>
         </div>
-      </main>
+      </div>
     </div>
   );
 };
