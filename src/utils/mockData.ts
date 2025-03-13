@@ -1,240 +1,239 @@
 
-import { User, Class, Note, AttendanceRecord, AttendanceSummary } from './types';
+import { User, UserRole, Class, Attendance, AttendanceSummary, AttendanceRecord } from "./types";
 
-// Mock Users
-export const getMockUsers = (): User[] => [
+// Users data
+const users: User[] = [
   {
-    id: 'admin1',
-    username: 'admin',
-    password: 'admin123', // In a real app, passwords would be hashed
-    name: 'Admin User',
-    email: 'admin@xavier.edu',
-    role: 'admin',
-    imageUrl: 'https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff',
+    id: "1",
+    username: "admin",
+    password: "admin123",
+    name: "Admin User",
+    email: "admin@xavier.edu",
+    role: "admin",
+    imageUrl: "https://ui-avatars.com/api/?name=Admin+User&background=0061A8&color=fff",
   },
   {
-    id: 'teacher1',
-    username: 'teacher',
-    password: 'teacher123',
-    name: 'Dr. Jane Smith',
-    email: 'jane.smith@xavier.edu',
-    role: 'teacher',
-    imageUrl: 'https://ui-avatars.com/api/?name=Jane+Smith&background=0D8ABC&color=fff',
-    department: 'Computer Science',
-    classIds: ['cs101', 'cs201', 'math101'],
+    id: "2",
+    username: "teacher",
+    password: "teacher123",
+    name: "Jennifer Smith",
+    email: "j.smith@xavier.edu",
+    role: "teacher",
+    imageUrl: "https://ui-avatars.com/api/?name=Jennifer+Smith&background=0061A8&color=fff",
+    department: "Computer Science",
   },
   {
-    id: 'teacher2',
-    username: 'teacher2',
-    password: 'teacher123',
-    name: 'Prof. Michael Johnson',
-    email: 'michael.johnson@xavier.edu',
-    role: 'teacher',
-    department: 'Mathematics',
-    classIds: ['math101', 'math201'],
-  },
-  {
-    id: 'student1',
-    username: 'student',
-    password: 'student123',
-    name: 'Alex Wong',
-    email: 'alex.wong@xavier.edu',
-    role: 'student',
-    imageUrl: 'https://ui-avatars.com/api/?name=Alex+Wong&background=0D8ABC&color=fff',
-    studentId: 'XC2023001',
-    classIds: ['cs101', 'math101', 'eng101'],
+    id: "3",
+    username: "student",
+    password: "student123",
+    name: "Michael Johnson",
+    email: "m.johnson@xavier.edu",
+    role: "student",
+    imageUrl: "https://ui-avatars.com/api/?name=Michael+Johnson&background=0061A8&color=fff",
+    studentId: "ST12345",
+    classIds: ["class1", "class2", "class3"],
     attendanceRecords: [
-      { classId: 'cs101', date: '2023-09-01', status: 'present' },
-      { classId: 'cs101', date: '2023-09-03', status: 'present' },
-      { classId: 'cs101', date: '2023-09-05', status: 'absent' },
-      { classId: 'math101', date: '2023-09-02', status: 'present' },
-      { classId: 'math101', date: '2023-09-04', status: 'present' },
-    ],
+      { classId: "class1", date: "2023-05-01", status: "present" },
+      { classId: "class1", date: "2023-05-02", status: "present" },
+      { classId: "class1", date: "2023-05-03", status: "absent" },
+      { classId: "class2", date: "2023-05-01", status: "present" },
+      { classId: "class2", date: "2023-05-02", status: "absent" },
+    ]
   },
   {
-    id: 'student2',
-    username: 'student2',
-    password: 'student123',
-    name: 'Emily Chen',
-    email: 'emily.chen@xavier.edu',
-    role: 'student',
-    studentId: 'XC2023002',
-    classIds: ['cs101', 'cs201', 'eng101'],
+    id: "4",
+    username: "student2",
+    password: "student123",
+    name: "Sarah Brown",
+    email: "s.brown@xavier.edu",
+    role: "student",
+    imageUrl: "https://ui-avatars.com/api/?name=Sarah+Brown&background=0061A8&color=fff",
+    studentId: "ST12346",
+    classIds: ["class1", "class3"],
     attendanceRecords: [
-      { classId: 'cs101', date: '2023-09-01', status: 'present' },
-      { classId: 'cs101', date: '2023-09-03', status: 'absent' },
-      { classId: 'cs101', date: '2023-09-05', status: 'present' },
-      { classId: 'cs201', date: '2023-09-02', status: 'present' },
-      { classId: 'cs201', date: '2023-09-04', status: 'present' },
-    ],
+      { classId: "class1", date: "2023-05-01", status: "present" },
+      { classId: "class1", date: "2023-05-02", status: "absent" },
+      { classId: "class1", date: "2023-05-03", status: "present" },
+      { classId: "class3", date: "2023-05-01", status: "present" },
+      { classId: "class3", date: "2023-05-02", status: "present" },
+    ]
   },
+  {
+    id: "5",
+    username: "teacher2",
+    password: "teacher123",
+    name: "David Wilson",
+    email: "d.wilson@xavier.edu",
+    role: "teacher",
+    imageUrl: "https://ui-avatars.com/api/?name=David+Wilson&background=0061A8&color=fff",
+    department: "Mathematics",
+  }
 ];
 
-// Mock Classes
-export const classes: Class[] = [
+// Classes data
+const classes: Class[] = [
   {
-    id: 'cs101',
-    name: 'Introduction to Computer Science',
-    subjectCode: 'CS101',
-    description: 'Fundamentals of computer science, including algorithms, programming concepts, and computational thinking.',
-    teacherId: 'teacher1',
-    teacherName: 'Dr. Jane Smith',
-    imageUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97',
+    id: "class1",
+    name: "Introduction to Computer Science",
+    description: "Basic concepts of computer science and programming",
+    teacherId: "2",
+    teacherName: "Jennifer Smith",
+    subjectCode: "CS101",
     schedule: [
-      { day: 'Monday', startTime: '10:00 AM', endTime: '11:30 AM', room: 'CS Building 101' },
-      { day: 'Wednesday', startTime: '10:00 AM', endTime: '11:30 AM', room: 'CS Building 101' },
+      { day: "Monday", startTime: "09:00", endTime: "10:30", room: "CS Lab 1" },
+      { day: "Wednesday", startTime: "09:00", endTime: "10:30", room: "CS Lab 1" },
     ],
-    studentIds: ['student1', 'student2'],
+    studentIds: ["3", "4"],
+    imageUrl: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97",
     notes: [
-      { id: 'note1', title: 'Introduction to Algorithms', content: 'Algorithms are step-by-step procedures for calculations...', createdAt: '2023-09-01', updatedAt: '2023-09-01' },
-      { id: 'note2', title: 'Control Structures', content: 'Control structures are the blocks that analyze variables...', createdAt: '2023-09-03', updatedAt: '2023-09-03' },
-    ],
+      {
+        id: "note1", 
+        classId: "class1",
+        title: "Introduction to Programming",
+        content: "Basic concepts of programming and algorithms",
+        createdAt: "2023-05-01T10:00:00Z",
+        updatedAt: "2023-05-01T10:00:00Z",
+      },
+      {
+        id: "note2",
+        classId: "class1",
+        title: "Variables and Data Types",
+        content: "Understanding variables, constants, and primitive data types",
+        createdAt: "2023-05-08T10:00:00Z",
+        updatedAt: "2023-05-08T10:00:00Z",
+      }
+    ]
   },
   {
-    id: 'cs201',
-    name: 'Data Structures and Algorithms',
-    subjectCode: 'CS201',
-    description: 'Study of data structures, algorithms, and their applications in solving computational problems.',
-    teacherId: 'teacher1',
-    teacherName: 'Dr. Jane Smith',
-    imageUrl: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c',
+    id: "class2",
+    name: "Web Development Fundamentals",
+    description: "Introduction to HTML, CSS, and JavaScript",
+    teacherId: "2",
+    teacherName: "Jennifer Smith",
+    subjectCode: "CS201",
     schedule: [
-      { day: 'Tuesday', startTime: '2:00 PM', endTime: '3:30 PM', room: 'CS Building 202' },
-      { day: 'Thursday', startTime: '2:00 PM', endTime: '3:30 PM', room: 'CS Building 202' },
+      { day: "Tuesday", startTime: "11:00", endTime: "12:30", room: "CS Lab 2" },
+      { day: "Thursday", startTime: "11:00", endTime: "12:30", room: "CS Lab 2" },
     ],
-    studentIds: ['student2'],
+    studentIds: ["3"],
+    imageUrl: "https://images.unsplash.com/photo-1547658719-da2b51169166",
     notes: [
-      { id: 'note3', title: 'Arrays and Linked Lists', content: 'Arrays and linked lists are fundamental data structures...', createdAt: '2023-09-02', updatedAt: '2023-09-02' },
-    ],
+      {
+        id: "note3",
+        classId: "class2",
+        title: "HTML Basics",
+        content: "Introduction to HTML structure and elements",
+        createdAt: "2023-05-02T11:00:00Z",
+        updatedAt: "2023-05-02T11:00:00Z",
+      }
+    ]
   },
   {
-    id: 'math101',
-    name: 'Calculus I',
-    subjectCode: 'MATH101',
-    description: 'Introduction to differential and integral calculus, with applications.',
-    teacherId: 'teacher2',
-    teacherName: 'Prof. Michael Johnson',
-    imageUrl: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb',
+    id: "class3",
+    name: "Calculus I",
+    description: "Introduction to differential calculus",
+    teacherId: "5",
+    teacherName: "David Wilson",
+    subjectCode: "MATH101",
     schedule: [
-      { day: 'Monday', startTime: '1:00 PM', endTime: '2:30 PM', room: 'Math Building 101' },
-      { day: 'Friday', startTime: '1:00 PM', endTime: '2:30 PM', room: 'Math Building 101' },
+      { day: "Monday", startTime: "13:00", endTime: "14:30", room: "Math Hall 1" },
+      { day: "Wednesday", startTime: "13:00", endTime: "14:30", room: "Math Hall 1" },
     ],
-    studentIds: ['student1'],
+    studentIds: ["3", "4"],
+    imageUrl: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb",
     notes: [
-      { id: 'note4', title: 'Limits and Continuity', content: 'A limit is the value that a function approaches...', createdAt: '2023-09-04', updatedAt: '2023-09-04' },
-    ],
+      {
+        id: "note4",
+        classId: "class3",
+        title: "Limits and Continuity",
+        content: "Understanding the concept of limits and continuity",
+        createdAt: "2023-05-01T13:00:00Z",
+        updatedAt: "2023-05-01T13:00:00Z",
+      }
+    ]
   },
   {
-    id: 'eng101',
-    name: 'English Composition',
-    subjectCode: 'ENG101',
-    description: 'Fundamentals of academic writing, critical reading, and rhetorical analysis.',
-    teacherId: 'teacher2',
-    teacherName: 'Prof. Sarah Johnson',
-    imageUrl: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8',
+    id: "class4",
+    name: "Data Structures",
+    description: "Advanced data structures and algorithms",
+    teacherId: "2",
+    teacherName: "Jennifer Smith",
+    subjectCode: "CS301",
     schedule: [
-      { day: 'Wednesday', startTime: '3:00 PM', endTime: '4:30 PM', room: 'Arts Building 101' },
-      { day: 'Friday', startTime: '3:00 PM', endTime: '4:30 PM', room: 'Arts Building 101' },
-    ],
-    studentIds: ['student1', 'student2'],
-    notes: [
-      { id: 'note5', title: 'Essay Structure', content: 'A well-structured essay includes an introduction, body paragraphs...', createdAt: '2023-09-05', updatedAt: '2023-09-05' },
-    ],
-  },
-  {
-    id: 'math201',
-    name: 'Calculus II',
-    subjectCode: 'MATH201',
-    description: 'Advanced topics in calculus, including integration techniques, series, and applications.',
-    teacherId: 'teacher2',
-    teacherName: 'Prof. Michael Johnson',
-    imageUrl: 'https://images.unsplash.com/photo-1509228468518-180dd4864904',
-    schedule: [
-      { day: 'Tuesday', startTime: '10:00 AM', endTime: '11:30 AM', room: 'Math Building 201' },
-      { day: 'Thursday', startTime: '10:00 AM', endTime: '11:30 AM', room: 'Math Building 201' },
+      { day: "Tuesday", startTime: "14:00", endTime: "15:30", room: "CS Lab 3" },
+      { day: "Thursday", startTime: "14:00", endTime: "15:30", room: "CS Lab 1" },
     ],
     studentIds: [],
-    notes: [],
+    imageUrl: "https://images.unsplash.com/photo-1555949963-aa79dcee981c",
+    notes: [
+      {
+        id: "note5",
+        classId: "class4",
+        title: "Arrays and Linked Lists",
+        content: "Understanding basic data structures: arrays and linked lists",
+        createdAt: "2023-05-03T14:00:00Z",
+        updatedAt: "2023-05-03T14:00:00Z",
+      }
+    ]
   },
+  {
+    id: "class5",
+    name: "Probability and Statistics",
+    description: "Introduction to probability theory and statistics",
+    teacherId: "5",
+    teacherName: "David Wilson",
+    subjectCode: "MATH201",
+    schedule: [
+      { day: "Monday", startTime: "15:00", endTime: "16:30", room: "Math Hall 2" },
+      { day: "Friday", startTime: "13:00", endTime: "14:30", room: "Math Hall 3" },
+    ],
+    studentIds: [],
+    imageUrl: "https://images.unsplash.com/photo-1509228627152-72ae9ae6848d",
+    notes: []
+  }
 ];
 
 // Mock login function
 export const mockLogin = (username: string, password: string): User | null => {
-  const users = getMockUsers();
   const user = users.find(u => u.username === username && u.password === password);
   
   if (user) {
-    // Remove password before returning
-    const { password, ...safeUser } = user;
-    return safeUser;
+    // Remove password before storing in localStorage
+    const { password, ...userWithoutPassword } = user;
+    localStorage.setItem('currentUser', JSON.stringify(userWithoutPassword));
+    return userWithoutPassword as User;
   }
   
   return null;
 };
 
-// Get all classes
-export const getAllClasses = (): Class[] => {
-  return classes;
+// Generate attendance summary
+export const generateAttendanceSummary = (classId: string): AttendanceSummary[] => {
+  const classItem = classes.find(c => c.id === classId);
+  if (!classItem) return [];
+  
+  return classItem.studentIds.map(studentId => {
+    const student = users.find(u => u.id === studentId);
+    if (!student || !student.attendanceRecords) return {
+      studentId,
+      studentName: 'Unknown Student',
+      totalClasses: 0,
+      presentClasses: 0,
+      percentage: 0
+    };
+    
+    const records = student.attendanceRecords.filter(rec => rec.classId === classId);
+    const totalClasses = records.length;
+    const presentClasses = records.filter(rec => rec.status === 'present').length;
+    
+    return {
+      studentId,
+      studentName: student.name,
+      totalClasses,
+      presentClasses,
+      percentage: totalClasses > 0 ? Math.round((presentClasses / totalClasses) * 100) : 0
+    };
+  });
 };
 
-// Get classes for a specific user
-export const getClassesForUser = (userId: string): Class[] => {
-  const users = getMockUsers();
-  const user = users.find(u => u.id === userId);
-  
-  if (!user) return [];
-  
-  if (user.role === 'admin') {
-    return classes;
-  }
-  
-  if (user.role === 'teacher') {
-    return classes.filter(c => c.teacherId === userId);
-  }
-  
-  if (user.role === 'student') {
-    return classes.filter(c => c.studentIds.includes(userId));
-  }
-  
-  return [];
-};
-
-// Get a specific class by ID
-export const getClassById = (classId: string): Class | undefined => {
-  return classes.find(c => c.id === classId);
-};
-
-// Get notes for a specific class
-export const getNotesForClass = (classId: string): Note[] => {
-  const classData = classes.find(c => c.id === classId);
-  return classData?.notes || [];
-};
-
-// Get attendance records for a student
-export const getAttendanceForStudent = (studentId: string): AttendanceRecord[] => {
-  const users = getMockUsers();
-  const student = users.find(u => u.id === studentId && u.role === 'student');
-  return student?.attendanceRecords || [];
-};
-
-// Generate attendance summary for a student in a class
-export const generateAttendanceSummary = (classId: string, studentId: string): AttendanceSummary => {
-  const records = getAttendanceForStudent(studentId).filter(r => r.classId === classId);
-  const totalClasses = records.length;
-  const presentClasses = records.filter(r => r.status === 'present').length;
-  const percentage = totalClasses > 0 ? (presentClasses / totalClasses) * 100 : 0;
-  
-  const users = getMockUsers();
-  const student = users.find(u => u.id === studentId);
-  
-  return {
-    studentId,
-    studentName: student?.name || 'Unknown Student',
-    totalClasses,
-    presentClasses,
-    percentage
-  };
-};
-
-// Get users export
-export const users = getMockUsers();
+export { users, classes };
