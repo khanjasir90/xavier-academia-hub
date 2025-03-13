@@ -21,10 +21,11 @@ type SidebarProps = {
   userRole: 'admin' | 'teacher' | 'student';
   userName: string;
   userImage?: string;
+  isOpen: boolean;
 };
 
-const Sidebar = ({ userRole, userName, userImage }: SidebarProps) => {
-  const [collapsed, setCollapsed] = useState(false);
+const Sidebar = ({ userRole, userName, userImage, isOpen }: SidebarProps) => {
+  const [collapsed, setCollapsed] = useState(!isOpen);
   const location = useLocation();
   const { toast } = useToast();
   const isMobile = useIsMobile();
